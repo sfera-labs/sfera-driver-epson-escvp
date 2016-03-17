@@ -3,27 +3,14 @@ package cc.sferalabs.sfera.drivers.epson.escvp;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+
 import cc.sferalabs.sfera.core.Configuration;
 import cc.sferalabs.sfera.drivers.Driver;
-import cc.sferalabs.sfera.drivers.epson.escvp.events.AspectEpsonEscVpEvent;
-import cc.sferalabs.sfera.drivers.epson.escvp.events.AudioEpsonEscVpEvent;
-import cc.sferalabs.sfera.drivers.epson.escvp.events.ColorModeEpsonEscVpEvent;
-import cc.sferalabs.sfera.drivers.epson.escvp.events.EpsonEscVpEvent;
-import cc.sferalabs.sfera.drivers.epson.escvp.events.ErrorEpsonEscVpEvent;
-import cc.sferalabs.sfera.drivers.epson.escvp.events.FreezeEpsonEscVpEvent;
-import cc.sferalabs.sfera.drivers.epson.escvp.events.LampEpsonEscVpEvent;
-import cc.sferalabs.sfera.drivers.epson.escvp.events.LuminanceEpsonEscVpEvent;
-import cc.sferalabs.sfera.drivers.epson.escvp.events.MselEpsonEscVpEvent;
-import cc.sferalabs.sfera.drivers.epson.escvp.events.MuteEpsonEscVpEvent;
-import cc.sferalabs.sfera.drivers.epson.escvp.events.PwrEpsonEscVpEvent;
-import cc.sferalabs.sfera.drivers.epson.escvp.events.SourceEpsonEscVpEvent;
-import cc.sferalabs.sfera.drivers.epson.escvp.events.UnknownMessageEpsonEscVpEvent;
-import cc.sferalabs.sfera.events.Bus;
 import cc.sferalabs.sfera.io.comm.CommPort;
 import cc.sferalabs.sfera.io.comm.CommPortException;
-import cc.sferalabs.sfera.io.comm.CommPortListener;
 
-public class EpsonEscVp extends Driver implements CommPortListener {
+public class EpsonEscVp extends Driver {
 
 	private static final String PARAM_ADDR = "addr";
 	private static final String PARAM_POLL_INTERVAL = "poll_interval";
@@ -46,14 +33,20 @@ public class EpsonEscVp extends Driver implements CommPortListener {
 	private long pollInterval;
 
 	private CommPort commPort;
-	private StringBuilder message = new StringBuilder();
-	private boolean isOn = false;
+	boolean isOn = false;
+	long lastPwrUpdate;
 	private int errCount = 0;
-	private final ArrayBlockingQueue<Object> writeLock = new ArrayBlockingQueue<>(1, true);
-	private long lastPwrUpdate;
+	final ArrayBlockingQueue<Object> writeLock = new ArrayBlockingQueue<>(1, true);
 
 	public EpsonEscVp(String id) {
 		super(id);
+	}
+
+	/**
+	 * @return
+	 */
+	Logger getLogger() {
+		return log;
 	}
 
 	@Override
@@ -69,7 +62,7 @@ public class EpsonEscVp extends Driver implements CommPortListener {
 			commPort = CommPort.open(addr);
 			commPort.setParams(9600, 8, CommPort.STOPBITS_1, CommPort.PARITY_NONE,
 					CommPort.FLOWCONTROL_NONE);
-			commPort.setListener(this);
+			commPort.setListener(new EpsonEscVpCommPortListener(this));
 		} catch (CommPortException e) {
 			log.error("Error initializing communication", e);
 			return false;
@@ -153,103 +146,6 @@ public class EpsonEscVp extends Driver implements CommPortListener {
 				log.warn("Error closing comm port");
 			}
 		}
-	}
-
-	@Override
-	public void onRead(byte[] bytes) {
-		for (byte b : bytes) {
-			if (b == (byte) ':') {
-				writeLock.offer(this);
-			} else if (b == (byte) 0x0D) {
-				processMessage(message.toString());
-				message = new StringBuilder();
-			} else {
-				char c = (char) (b & 0xFF);
-				message.append(c);
-			}
-		}
-	}
-
-	@Override
-	public void onError(Throwable t) {
-		log.warn("Communication error", t);
-	}
-
-	/**
-	 * 
-	 * @param message
-	 */
-	private void processMessage(String message) {
-		log.debug("Processing message: {}", message);
-		int eqIdx = message.indexOf("=");
-		if (eqIdx > 0) {
-			String command = message.substring(0, eqIdx);
-			String param = message.substring(eqIdx + 1);
-			EpsonEscVpEvent e;
-			switch (command) {
-			case "PWR":
-				e = new PwrEpsonEscVpEvent(this, param);
-				isOn = "01".equals(param);
-				lastPwrUpdate = System.currentTimeMillis();
-				break;
-
-			case "ERR":
-				e = new ErrorEpsonEscVpEvent(this, param);
-				break;
-
-			case "SOURCE":
-				e = new SourceEpsonEscVpEvent(this, param);
-				break;
-
-			case "MSEL":
-				e = new MselEpsonEscVpEvent(this, param);
-				break;
-
-			case "ASPECT":
-				e = new AspectEpsonEscVpEvent(this, param);
-				break;
-
-			case "CMODE":
-				e = new ColorModeEpsonEscVpEvent(this, param);
-				break;
-
-			case "LAMP":
-				e = new LampEpsonEscVpEvent(this, param);
-				break;
-
-			case "LUMINANCE":
-				e = new LuminanceEpsonEscVpEvent(this, param);
-				break;
-
-			case "MUTE":
-				e = new MuteEpsonEscVpEvent(this, param);
-				break;
-
-			case "FREEZE":
-				e = new FreezeEpsonEscVpEvent(this, param);
-				break;
-
-			case "AUDIO":
-				e = new AudioEpsonEscVpEvent(this, param);
-				break;
-
-			default:
-				e = null;
-				break;
-			}
-
-			if (e != null) {
-				Bus.postIfChanged(e);
-				return;
-			}
-		}
-
-		if (message.equals("ERR")) {
-			log.warn("Received command error (ERR) response");
-			return;
-		}
-
-		Bus.postIfChanged(new UnknownMessageEpsonEscVpEvent(this, message));
 	}
 
 	/**
