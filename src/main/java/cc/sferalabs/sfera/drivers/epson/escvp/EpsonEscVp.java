@@ -153,9 +153,19 @@ public class EpsonEscVp extends Driver {
 	 * @throws CommPortException
 	 * @throws InterruptedException
 	 */
-	public synchronized boolean sendSetCommand(String cmd)
+	public synchronized boolean sendCommand(String cmd)
 			throws CommPortException, InterruptedException {
 		return writeAndWait(new EscVpCommand(cmd));
+	}
+	
+	/**
+	 * @param code
+	 * @return
+	 * @throws CommPortException
+	 * @throws InterruptedException
+	 */
+	public boolean key(String code) throws CommPortException, InterruptedException {
+		return sendCommand("KEY " + code);
 	}
 
 	/**
@@ -163,7 +173,7 @@ public class EpsonEscVp extends Driver {
 	 * @throws InterruptedException
 	 */
 	public boolean setOn() throws CommPortException, InterruptedException {
-		return sendSetCommand("PWR ON");
+		return sendCommand("PWR ON");
 	}
 
 	/**
@@ -171,7 +181,7 @@ public class EpsonEscVp extends Driver {
 	 * @throws InterruptedException
 	 */
 	public boolean setOff() throws CommPortException, InterruptedException {
-		return sendSetCommand("PWR OFF");
+		return sendCommand("PWR OFF");
 	}
 
 	/**
@@ -181,7 +191,7 @@ public class EpsonEscVp extends Driver {
 	 * @throws InterruptedException
 	 */
 	public boolean setSource(String source) throws CommPortException, InterruptedException {
-		return sendSetCommand("SOURCE " + source);
+		return sendCommand("SOURCE " + source);
 	}
 
 	/**
@@ -201,7 +211,7 @@ public class EpsonEscVp extends Driver {
 		} else {
 			v = val;
 		}
-		return sendSetCommand("MSEL " + v);
+		return sendCommand("MSEL " + v);
 	}
 
 	/**
@@ -229,7 +239,7 @@ public class EpsonEscVp extends Driver {
 		} else {
 			v = val;
 		}
-		return sendSetCommand("ASPECT " + v);
+		return sendCommand("ASPECT " + v);
 	}
 
 	/**
@@ -239,7 +249,7 @@ public class EpsonEscVp extends Driver {
 	 * @throws InterruptedException
 	 */
 	public boolean setColorMode(String colorMode) throws CommPortException, InterruptedException {
-		return sendSetCommand("CMODE " + colorMode);
+		return sendCommand("CMODE " + colorMode);
 	}
 
 	/**
@@ -250,7 +260,7 @@ public class EpsonEscVp extends Driver {
 	 * @throws InterruptedException
 	 */
 	public boolean setLuminance(String highOrLow) throws CommPortException, InterruptedException {
-		return sendSetCommand("LUMINANCE " + (highOrLow.equalsIgnoreCase("high") ? "00" : "01"));
+		return sendCommand("LUMINANCE " + (highOrLow.equalsIgnoreCase("high") ? "00" : "01"));
 	}
 
 	/**
@@ -260,7 +270,7 @@ public class EpsonEscVp extends Driver {
 	 * @throws InterruptedException
 	 */
 	public boolean setMute(boolean mute) throws CommPortException, InterruptedException {
-		return sendSetCommand("MUTE " + (mute ? "ON" : "OFF"));
+		return sendCommand("MUTE " + (mute ? "ON" : "OFF"));
 	}
 
 	/**
@@ -270,7 +280,7 @@ public class EpsonEscVp extends Driver {
 	 * @throws InterruptedException
 	 */
 	public boolean setFreeze(boolean freeze) throws CommPortException, InterruptedException {
-		return sendSetCommand("FREEZE " + (freeze ? "ON" : "OFF"));
+		return sendCommand("FREEZE " + (freeze ? "ON" : "OFF"));
 	}
 
 	/**
@@ -280,7 +290,7 @@ public class EpsonEscVp extends Driver {
 	 * @throws InterruptedException
 	 */
 	public boolean setAudio(String val) throws CommPortException, InterruptedException {
-		return sendSetCommand("AUDIO " + val);
+		return sendCommand("AUDIO " + val);
 	}
 
 }

@@ -4,7 +4,7 @@
 
 	<groupId>cc.sferalabs.sfera.drivers</groupId>
 	<artifactId>epson-escvp</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 
 	<name>EpsonEscVp</name>
 	<description>EPSON ESC/VP driver</description>
