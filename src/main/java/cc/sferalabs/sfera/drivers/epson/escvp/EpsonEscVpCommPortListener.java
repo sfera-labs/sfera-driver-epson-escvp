@@ -64,6 +64,10 @@ public class EpsonEscVpCommPortListener implements CommPortListener {
 	 */
 	private void processMessage(String message) {
 		driver.getLogger().debug("Processing message: {}", message);
+		if (message.equals("PWR?")) {
+			// Echo from projector happening in some cases when it is off
+			message = "PWR=00";
+		}
 		int eqIdx = message.indexOf("=");
 		if (eqIdx > 0) {
 			String command = message.substring(0, eqIdx);
@@ -132,7 +136,7 @@ public class EpsonEscVpCommPortListener implements CommPortListener {
 			return;
 		}
 
-		Bus.postIfChanged(new UnknownMessageEpsonEscVpEvent(driver, message));
+		Bus.post(new UnknownMessageEpsonEscVpEvent(driver, message));
 	}
 
 }
