@@ -1,4 +1,4 @@
-package cc.sferalabs.sfera.drivers.epson.escvp;
+package cc.sferalabs.sfera.drivers.epson_escvp;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package cc.sferalabs.sfera.drivers.epson.escvp;
+package cc.sferalabs.sfera.drivers.epson_escvp;
 
 import java.nio.charset.StandardCharsets;
 

@@ -1,21 +1,21 @@
 /**
  * 
  */
-package cc.sferalabs.sfera.drivers.epson.escvp;
+package cc.sferalabs.sfera.drivers.epson_escvp;
 
-import cc.sferalabs.sfera.drivers.epson.escvp.events.AspectEpsonEscVpEvent;
-import cc.sferalabs.sfera.drivers.epson.escvp.events.AudioEpsonEscVpEvent;
-import cc.sferalabs.sfera.drivers.epson.escvp.events.ColorModeEpsonEscVpEvent;
-import cc.sferalabs.sfera.drivers.epson.escvp.events.EpsonEscVpEvent;
-import cc.sferalabs.sfera.drivers.epson.escvp.events.ErrorEpsonEscVpEvent;
-import cc.sferalabs.sfera.drivers.epson.escvp.events.FreezeEpsonEscVpEvent;
-import cc.sferalabs.sfera.drivers.epson.escvp.events.LampEpsonEscVpEvent;
-import cc.sferalabs.sfera.drivers.epson.escvp.events.LuminanceEpsonEscVpEvent;
-import cc.sferalabs.sfera.drivers.epson.escvp.events.MselEpsonEscVpEvent;
-import cc.sferalabs.sfera.drivers.epson.escvp.events.MuteEpsonEscVpEvent;
-import cc.sferalabs.sfera.drivers.epson.escvp.events.PwrEpsonEscVpEvent;
-import cc.sferalabs.sfera.drivers.epson.escvp.events.SourceEpsonEscVpEvent;
-import cc.sferalabs.sfera.drivers.epson.escvp.events.UnknownMessageEpsonEscVpEvent;
+import cc.sferalabs.sfera.drivers.epson_escvp.events.AspectEpsonEscVpEvent;
+import cc.sferalabs.sfera.drivers.epson_escvp.events.AudioEpsonEscVpEvent;
+import cc.sferalabs.sfera.drivers.epson_escvp.events.ColorModeEpsonEscVpEvent;
+import cc.sferalabs.sfera.drivers.epson_escvp.events.EpsonEscVpEvent;
+import cc.sferalabs.sfera.drivers.epson_escvp.events.ErrorEpsonEscVpEvent;
+import cc.sferalabs.sfera.drivers.epson_escvp.events.FreezeEpsonEscVpEvent;
+import cc.sferalabs.sfera.drivers.epson_escvp.events.LampEpsonEscVpEvent;
+import cc.sferalabs.sfera.drivers.epson_escvp.events.LuminanceEpsonEscVpEvent;
+import cc.sferalabs.sfera.drivers.epson_escvp.events.MselEpsonEscVpEvent;
+import cc.sferalabs.sfera.drivers.epson_escvp.events.MuteEpsonEscVpEvent;
+import cc.sferalabs.sfera.drivers.epson_escvp.events.PwrEpsonEscVpEvent;
+import cc.sferalabs.sfera.drivers.epson_escvp.events.SourceEpsonEscVpEvent;
+import cc.sferalabs.sfera.drivers.epson_escvp.events.UnknownMessageEpsonEscVpEvent;
 import cc.sferalabs.sfera.events.Bus;
 import cc.sferalabs.sfera.io.comm.CommPortListener;
 

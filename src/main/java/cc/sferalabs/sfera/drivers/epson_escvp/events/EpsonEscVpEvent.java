@@ -1,4 +1,4 @@
-package cc.sferalabs.sfera.drivers.epson.escvp.events;
+package cc.sferalabs.sfera.drivers.epson_escvp.events;
 
 import cc.sferalabs.sfera.events.Event;
 
