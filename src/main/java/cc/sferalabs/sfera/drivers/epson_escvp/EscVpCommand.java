@@ -40,7 +40,7 @@ public class EscVpCommand {
 	final byte[] bytes;
 
 	/**
-	 * 
+	 * @param cmd
 	 */
 	public EscVpCommand(String cmd) {
 		this.text = cmd;

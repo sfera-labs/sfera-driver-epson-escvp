@@ -59,7 +59,7 @@ public class PwrEpsonEscVpEvent extends StringEvent implements EpsonEscVpEvent {
 			return "on";
 
 		case "02":
-			return "wormup";
+			return "warmup";
 
 		case "03":
 			return "cooling";

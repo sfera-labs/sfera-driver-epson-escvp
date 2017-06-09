@@ -34,12 +34,11 @@ import cc.sferalabs.sfera.io.comm.CommPortException;
 
 public class EpsonEscVp extends Driver {
 
-	private static final String PARAM_ADDR = "addr";
-	private static final String PARAM_POLL_INTERVAL = "poll_interval";
-
 	private static final long MAX_WRITE_WAIT_TIME_SECONDS = 20;
 	private static final long MAX_COMMAND_RESPONSE_TIME_SECONDS = 5;
 
+	private final static byte[] connectCmd = { 0x45, 0x53, 0x43, 0x2F, 0x56, 0x50, 0x2E, 0x6E, 0x65, 0x74, 0x10, 0x03,
+			0x00, 0x00, 0x00, 0x00 };
 	private static final EscVpCommand GET_PWR = new EscVpCommand("PWR?");
 	private static final EscVpCommand GET_ERR = new EscVpCommand("ERR?");
 	private static final EscVpCommand GET_SOURCE = new EscVpCommand("SOURCE?");
@@ -73,20 +72,45 @@ public class EpsonEscVp extends Driver {
 
 	@Override
 	protected boolean onInit(Configuration config) throws InterruptedException {
-		String addr = config.get(PARAM_ADDR, null);
+		String addr = config.get("addr", null);
 		if (addr == null) {
-			log.error("Param {} not specified in configuration", PARAM_ADDR);
+			log.error("Address not specified in configuration");
 			return false;
 		}
-		pollInterval = config.get(PARAM_POLL_INTERVAL, 10) * 1000l;
+		pollInterval = config.get("poll_interval", 10) * 1000l;
 
 		try {
 			commPort = CommPort.open(addr);
-			commPort.setParams(9600, 8, CommPort.STOPBITS_1, CommPort.PARITY_NONE,
-					CommPort.FLOWCONTROL_NONE);
-			commPort.setListener(new EpsonEscVpCommPortListener(this));
+			commPort.setParams(9600, 8, CommPort.STOPBITS_1, CommPort.PARITY_NONE, CommPort.FLOWCONTROL_NONE);
 		} catch (CommPortException e) {
 			log.error("Error initializing communication", e);
+			return false;
+		}
+
+		boolean net = config.get("net", true);
+		if (net) {
+			log.debug("Connecting...");
+			try {
+				commPort.writeBytes(connectCmd);
+				commPort.writeByte(0x0D);
+				byte[] connectResp = new byte[16];
+				commPort.readBytes(connectResp, 0, connectResp.length, 3000);
+
+				// check type identifier = 3 (CONNECT)
+				// and status code = 0x20 (32 - OK)
+				if (connectResp[11] != 3 || connectResp[14] != 32) {
+					throw new Exception("Connect response error");
+				}
+			} catch (Exception e) {
+				log.error("Connection error", e);
+				return false;
+			}
+		}
+
+		try {
+			commPort.setListener(new EpsonEscVpCommPortListener(this));
+		} catch (CommPortException e) {
+			log.error("Error setting comm listener", e);
 			return false;
 		}
 
@@ -133,8 +157,7 @@ public class EpsonEscVp extends Driver {
 	 * @throws CommPortException
 	 * @throws InterruptedException
 	 */
-	private synchronized void write(EscVpCommand cmd)
-			throws CommPortException, InterruptedException {
+	private synchronized void write(EscVpCommand cmd) throws CommPortException, InterruptedException {
 		if (writeLock.poll(MAX_WRITE_WAIT_TIME_SECONDS, TimeUnit.SECONDS) == null) {
 			log.debug("Write lock timeout elapsed {}", cmd.text);
 		}
@@ -175,11 +198,10 @@ public class EpsonEscVp extends Driver {
 	 * @throws CommPortException
 	 * @throws InterruptedException
 	 */
-	public synchronized boolean sendCommand(String cmd)
-			throws CommPortException, InterruptedException {
+	public synchronized boolean sendCommand(String cmd) throws CommPortException, InterruptedException {
 		return writeAndWait(new EscVpCommand(cmd));
 	}
-	
+
 	/**
 	 * @param code
 	 * @return

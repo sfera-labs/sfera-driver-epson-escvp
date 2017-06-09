@@ -7,9 +7,11 @@
 			cc.sferalabs.sfera.drivers.epson.escvp.EpsonEscVp
 		@sfera.config addr
 			name of the local serial port (e.g. "/dev/ttyS0") or address of the remote gateway
-			in the format <hostname>:<port> (e.g. "192.168.1.150:4040" or "port.example.com:5001")
+			in the format <hostname>:<port> (e.g. "192.168.1.150:3629" or "port.example.com:5001")
 		@sfera.config poll_interval
 			time interval (in seconds) between state requests cycles, defaults to 10
+		@sfera.config net
+			set to false if connecting to the projector via serial port
 
 	</body>
 </HTML>
