@@ -154,7 +154,7 @@ public class EpsonEscVpCommPortListener implements CommPortListener {
 		}
 
 		if (message.equals("ERR")) {
-			driver.getLogger().warn("Received command error (ERR) response");
+			driver.getLogger().debug("Received command error (ERR) response");
 			return;
 		}
 
