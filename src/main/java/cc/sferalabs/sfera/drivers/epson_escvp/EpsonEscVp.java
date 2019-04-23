@@ -22,6 +22,7 @@
 
 package cc.sferalabs.sfera.drivers.epson_escvp;
 
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -87,10 +88,10 @@ public class EpsonEscVp extends Driver {
 			return false;
 		}
 
-		boolean net = config.get("net", true);
-		if (net) {
-			log.debug("Connecting...");
-			try {
+		log.debug("Connecting...");
+		try {
+			boolean net = config.get("net", true);
+			if (net) {
 				commPort.writeBytes(connectCmd);
 				commPort.writeByte(0x0D);
 				byte[] connectResp = new byte[16];
@@ -101,10 +102,19 @@ public class EpsonEscVp extends Driver {
 				if (connectResp[11] != 3 || connectResp[14] != 32) {
 					throw new Exception("Connect response error");
 				}
-			} catch (Exception e) {
-				log.error("Connection error", e);
-				return false;
+			} else {
+				commPort.writeBytes(GET_PWR.bytes);
+				commPort.writeByte(0x0D);
+				byte[] connectResp = new byte[3];
+				commPort.readBytes(connectResp, 0, connectResp.length, 3000);
+				commPort.clear();
+				if (!"PWR".equals(new String(connectResp, StandardCharsets.UTF_8))) {
+					throw new Exception("Connect response error");
+				}
 			}
+		} catch (Exception e) {
+			log.error("Connection error", e);
+			return false;
 		}
 
 		try {
